@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Money Calculator</title>
+  <title>מחשבון כסף</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -14,15 +14,14 @@
       min-height: 100vh;
     }
 
-    /* ── Top bar ── */
     header {
       background: #fff;
       border-bottom: 1px solid #dadce0;
-      padding: 0 24px;
+      padding: 0 16px;
       height: 56px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -31,64 +30,59 @@
     header .logo {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 20px;
-      font-weight: 600;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 700;
       color: #1a73e8;
+      white-space: nowrap;
     }
-    header .logo span { font-size: 26px; }
     .tabs {
       display: flex;
-      gap: 4px;
+      gap: 2px;
       margin-left: auto;
+      overflow-x: auto;
     }
     .tab-btn {
-      padding: 8px 18px;
+      padding: 7px 14px;
       border: none;
       border-radius: 20px;
       background: transparent;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
       color: #5f6368;
       transition: background .15s, color .15s;
+      white-space: nowrap;
     }
-    .tab-btn.active {
-      background: #e8f0fe;
-      color: #1a73e8;
-    }
+    .tab-btn.active { background: #e8f0fe; color: #1a73e8; }
     .tab-btn:hover:not(.active) { background: #f1f3f4; }
 
-    /* ── Layout ── */
     main {
       max-width: 1100px;
-      margin: 24px auto;
-      padding: 0 16px;
+      margin: 20px auto;
+      padding: 0 14px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 18px;
     }
     .full { grid-column: 1 / -1; }
 
-    /* ── Cards ── */
     .card {
       background: #fff;
       border-radius: 12px;
-      padding: 24px;
+      padding: 20px;
       box-shadow: 0 1px 4px rgba(0,0,0,.1);
     }
     .card h2 {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       color: #3c4043;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
     }
-    .card h2 .icon { font-size: 20px; }
 
-    /* ── Sections (tab panels) ── */
     .section { display: none; }
     .section.active { display: contents; }
 
@@ -97,35 +91,17 @@
       background: #f8f9fa;
       border: 1px solid #dadce0;
       border-radius: 8px;
-      padding: 16px;
+      padding: 14px;
       text-align: right;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
-    .calc-expr {
-      font-size: 13px;
-      color: #80868b;
-      min-height: 20px;
-      word-break: break-all;
-    }
-    .calc-result {
-      font-size: 36px;
-      font-weight: 300;
-      color: #202124;
-      word-break: break-all;
-    }
-    .calc-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
+    .calc-expr { font-size: 12px; color: #80868b; min-height: 18px; word-break: break-all; }
+    .calc-result { font-size: 34px; font-weight: 300; color: #202124; word-break: break-all; }
+    .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
     .btn {
-      border: none;
-      border-radius: 8px;
-      font-size: 18px;
-      cursor: pointer;
-      padding: 16px 0;
-      transition: filter .1s, transform .08s;
-      font-weight: 500;
+      border: none; border-radius: 8px; font-size: 17px;
+      cursor: pointer; padding: 15px 0;
+      transition: filter .1s, transform .08s; font-weight: 500;
     }
     .btn:active { transform: scale(.95); }
     .btn-num  { background: #f1f3f4; color: #202124; }
@@ -138,172 +114,209 @@
     .btn-clear:hover { filter: brightness(.93); }
     .span2 { grid-column: span 2; }
 
-    /* ── Currency Converter ── */
-    .conv-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
+    /* ── Converter ── */
+    .conv-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
     .conv-row input, .conv-row select {
-      flex: 1;
-      padding: 10px 12px;
-      border: 1px solid #dadce0;
-      border-radius: 8px;
-      font-size: 15px;
-      outline: none;
-      transition: border .15s;
+      flex: 1; padding: 10px 12px; border: 1px solid #dadce0;
+      border-radius: 8px; font-size: 14px; outline: none;
     }
     .conv-row input:focus, .conv-row select:focus { border-color: #1a73e8; }
     .swap-btn {
-      background: #e8f0fe;
-      border: none;
-      border-radius: 50%;
-      width: 38px;
-      height: 38px;
-      cursor: pointer;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .15s;
-      flex-shrink: 0;
+      background: #e8f0fe; border: none; border-radius: 50%;
+      width: 36px; height: 36px; cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s; flex-shrink: 0;
     }
     .swap-btn:hover { background: #d2e3fc; }
     .conv-result-box {
-      background: #e6f4ea;
-      border-radius: 8px;
-      padding: 14px 16px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: 600;
-      color: #137333;
-      margin-top: 10px;
+      background: #e6f4ea; border-radius: 8px; padding: 12px 14px;
+      text-align: center; font-size: 20px; font-weight: 600;
+      color: #137333; margin-top: 8px;
     }
-    .conv-rate {
-      text-align: center;
-      font-size: 12px;
-      color: #80868b;
-      margin-top: 6px;
-    }
+    .conv-rate { text-align: center; font-size: 11px; color: #80868b; margin-top: 5px; }
 
-    /* ── Money Types ── */
-    .money-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
+    /* ── Money grid ── */
+    .money-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
     .money-card {
-      border: 1px solid #dadce0;
-      border-radius: 10px;
-      padding: 14px;
-      cursor: pointer;
-      transition: border-color .15s, box-shadow .15s;
+      border: 1px solid #dadce0; border-radius: 10px; padding: 12px;
+      cursor: pointer; transition: border-color .15s, box-shadow .15s;
     }
     .money-card:hover { border-color: #1a73e8; box-shadow: 0 2px 8px rgba(26,115,232,.15); }
     .money-card.selected { border-color: #1a73e8; background: #e8f0fe; }
-    .money-card .flag { font-size: 28px; display: block; margin-bottom: 4px; }
-    .money-card .code { font-weight: 700; font-size: 14px; }
+    .money-card .flag { font-size: 26px; display: block; margin-bottom: 3px; }
+    .money-card .code { font-weight: 700; font-size: 13px; }
     .money-card .name { font-size: 11px; color: #80868b; }
-    .money-card .rate { font-size: 12px; color: #1a73e8; margin-top: 4px; }
+    .money-card .rate { font-size: 11px; color: #1a73e8; margin-top: 3px; }
 
     /* ── Stats ── */
-    .stat-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-    .stat-row { display: flex; align-items: center; gap: 10px; }
-    .stat-row label { font-size: 13px; color: #5f6368; min-width: 130px; }
+    .stat-inputs { display: flex; flex-direction: column; gap: 9px; margin-bottom: 14px; }
+    .stat-row { display: flex; align-items: center; gap: 8px; }
+    .stat-row label { font-size: 12px; color: #5f6368; min-width: 120px; }
     .stat-row input, .stat-row select {
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid #dadce0;
-      border-radius: 8px;
-      font-size: 14px;
-      outline: none;
+      flex: 1; padding: 8px 10px; border: 1px solid #dadce0;
+      border-radius: 8px; font-size: 13px; outline: none;
     }
     .stat-row input:focus { border-color: #1a73e8; }
     .calc-stats-btn {
-      width: 100%;
-      padding: 12px;
-      background: #1a73e8;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background .15s;
+      width: 100%; padding: 11px; background: #1a73e8; color: #fff;
+      border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
     }
     .calc-stats-btn:hover { background: #1557b0; }
-    .stats-result {
-      margin-top: 16px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .stat-box {
-      background: #f8f9fa;
-      border-radius: 8px;
-      padding: 14px;
-      text-align: center;
-    }
-    .stat-box .s-label { font-size: 11px; color: #80868b; text-transform: uppercase; letter-spacing: .5px; }
-    .stat-box .s-val { font-size: 22px; font-weight: 700; color: #1a73e8; margin-top: 4px; }
-    .stat-box .s-sub { font-size: 11px; color: #80868b; }
-
-    /* ── Bar chart ── */
-    .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 100px; margin-top: 10px; }
-    .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .bar {
-      width: 100%;
-      background: #1a73e8;
-      border-radius: 4px 4px 0 0;
-      transition: height .4s ease;
-      min-height: 4px;
-    }
+    .stats-result { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .stat-box { background: #f8f9fa; border-radius: 8px; padding: 12px; text-align: center; }
+    .stat-box .s-label { font-size: 10px; color: #80868b; text-transform: uppercase; letter-spacing: .5px; }
+    .stat-box .s-val { font-size: 20px; font-weight: 700; color: #1a73e8; margin-top: 3px; }
+    .stat-box .s-sub { font-size: 10px; color: #80868b; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 5px; height: 90px; margin-top: 8px; }
+    .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .bar { width: 100%; background: #1a73e8; border-radius: 4px 4px 0 0; min-height: 3px; }
     .bar.interest { background: #34a853; }
-    .bar-lbl { font-size: 10px; color: #80868b; }
+    .bar-lbl { font-size: 9px; color: #80868b; }
 
-    /* ── Crypto strip ── */
-    .crypto-strip {
-      display: flex;
-      gap: 12px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-    }
+    /* ── Crypto ── */
+    .crypto-strip { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
     .crypto-chip {
-      flex-shrink: 0;
-      background: #f8f9fa;
-      border: 1px solid #dadce0;
-      border-radius: 20px;
-      padding: 8px 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
+      flex-shrink: 0; background: #f8f9fa; border: 1px solid #dadce0;
+      border-radius: 20px; padding: 7px 12px;
+      display: flex; align-items: center; gap: 7px; font-size: 12px;
     }
-    .crypto-chip .c-icon { font-size: 20px; }
+    .crypto-chip .c-icon { font-size: 18px; }
     .crypto-chip .c-name { font-weight: 600; }
     .crypto-chip .c-price { color: #137333; font-weight: 500; }
-    .crypto-chip .c-chg { font-size: 11px; }
-    .c-up { color: #137333; }
-    .c-dn { color: #d93025; }
+    .c-up { color: #137333; font-size: 10px; }
+    .c-dn { color: #d93025; font-size: 10px; }
 
-    /* ── Responsive ── */
+    /* ══════════════════════════════════════
+       BANK ACCOUNT TAB
+    ══════════════════════════════════════ */
+    .bank-summary {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 12px;
+    }
+    .bank-sum-box {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      border: 1px solid #e8eaed;
+    }
+    .bank-sum-box .bs-label {
+      font-size: 11px; color: #80868b;
+      margin-bottom: 6px; font-weight: 500;
+    }
+    .bank-sum-box .bs-val {
+      font-size: 22px; font-weight: 700;
+    }
+    .bank-sum-box .bs-sub { font-size: 10px; color: #80868b; margin-top: 3px; }
+
+    /* Transaction form */
+    .type-toggle { display: flex; gap: 0; margin-bottom: 12px; border-radius: 8px; overflow: hidden; border: 1px solid #dadce0; }
+    .type-toggle button {
+      flex: 1; padding: 10px; border: none; cursor: pointer;
+      font-size: 14px; font-weight: 600; transition: background .15s, color .15s;
+      background: #f8f9fa; color: #5f6368;
+    }
+    .type-toggle button.active-income { background: #e6f4ea; color: #137333; }
+    .type-toggle button.active-expense { background: #fce8e6; color: #d93025; }
+
+    .bank-form-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+    .bank-form-row label { font-size: 12px; color: #5f6368; font-weight: 500; }
+    .bank-form-row input,
+    .bank-form-row select,
+    .bank-form-row textarea {
+      padding: 9px 12px; border: 1px solid #dadce0; border-radius: 8px;
+      font-size: 14px; outline: none; font-family: inherit;
+    }
+    .bank-form-row input:focus,
+    .bank-form-row select:focus { border-color: #1a73e8; }
+
+    .add-tx-btn {
+      width: 100%; padding: 12px; border: none; border-radius: 8px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: background .15s; margin-top: 4px;
+    }
+    .add-tx-btn.income-btn { background: #34a853; color: #fff; }
+    .add-tx-btn.income-btn:hover { background: #2d8f47; }
+    .add-tx-btn.expense-btn { background: #d93025; color: #fff; }
+    .add-tx-btn.expense-btn:hover { background: #b7271f; }
+
+    /* Charts */
+    .chart-container { width: 100%; overflow: hidden; }
+    .chart-empty {
+      display: flex; align-items: center; justify-content: center;
+      height: 160px; color: #80868b; font-size: 14px;
+      flex-direction: column; gap: 8px;
+    }
+
+    /* Monthly chart */
+    .monthly-bars {
+      display: flex; align-items: flex-end; gap: 8px;
+      height: 120px; margin-top: 8px;
+    }
+    .month-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .month-bars { display: flex; gap: 2px; align-items: flex-end; width: 100%; }
+    .month-bar { flex: 1; border-radius: 3px 3px 0 0; min-height: 3px; transition: height .3s; }
+    .month-bar.inc { background: #34a853; }
+    .month-bar.exp { background: #ea4335; }
+    .month-lbl { font-size: 10px; color: #80868b; margin-top: 4px; text-align: center; }
+
+    /* Transaction table */
+    .tx-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .tx-table thead tr { background: #f8f9fa; }
+    .tx-table th {
+      padding: 10px 12px; text-align: right; font-size: 11px;
+      color: #80868b; text-transform: uppercase; letter-spacing: .4px;
+      font-weight: 600; border-bottom: 1px solid #e8eaed;
+    }
+    .tx-table th:first-child,
+    .tx-table td:first-child { text-align: left; }
+    .tx-table td { padding: 10px 12px; border-bottom: 1px solid #f1f3f4; vertical-align: middle; }
+    .tx-table tbody tr:hover { background: #f8f9fa; }
+    .tx-row-income .tx-amount { color: #137333; font-weight: 700; }
+    .tx-row-expense .tx-amount { color: #d93025; font-weight: 700; }
+    .tx-bal-pos { color: #137333; font-size: 12px; }
+    .tx-bal-neg { color: #d93025; font-size: 12px; }
+    .tx-cat-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #f1f3f4; border-radius: 12px; padding: 3px 8px;
+      font-size: 12px;
+    }
+    .del-btn {
+      background: none; border: none; cursor: pointer;
+      color: #80868b; font-size: 16px; padding: 2px 6px;
+      border-radius: 4px; transition: color .15s, background .15s;
+    }
+    .del-btn:hover { color: #d93025; background: #fce8e6; }
+
+    .no-tx {
+      text-align: center; padding: 32px; color: #80868b;
+      font-size: 14px;
+    }
+
+    /* Legend */
+    .legend { display: flex; gap: 14px; font-size: 12px; color: #5f6368; margin-top: 8px; flex-wrap: wrap; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
     @media (max-width: 700px) {
       main { grid-template-columns: 1fr; }
       .full { grid-column: 1; }
-      .money-grid { grid-template-columns: repeat(2, 1fr); }
+      .money-grid { grid-template-columns: repeat(2,1fr); }
+      .bank-summary { grid-template-columns: repeat(2,1fr); }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo"><span>💰</span> Money Calculator</div>
+  <div class="logo">💰 מחשבון כסף</div>
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="calc">Calculator</button>
-    <button class="tab-btn" data-tab="convert">Convert</button>
-    <button class="tab-btn" data-tab="types">Currencies</button>
-    <button class="tab-btn" data-tab="stats">Stats</button>
+    <button class="tab-btn active" data-tab="calc">🧮 מחשבון</button>
+    <button class="tab-btn" data-tab="bank">🏦 חשבון בנק</button>
+    <button class="tab-btn" data-tab="convert">🔄 המרה</button>
+    <button class="tab-btn" data-tab="types">🌍 מטבעות</button>
+    <button class="tab-btn" data-tab="stats">📐 סטטיסטיקות</button>
   </nav>
 </header>
 
@@ -312,7 +325,7 @@
   <!-- ══ CALCULATOR ══ -->
   <div class="section active" id="tab-calc">
     <div class="card">
-      <h2><span class="icon">🧮</span> Calculator</h2>
+      <h2>🧮 מחשבון</h2>
       <div class="calc-display">
         <div class="calc-expr" id="calcExpr"></div>
         <div class="calc-result" id="calcResult">0</div>
@@ -321,22 +334,18 @@
         <button class="btn btn-clear span2" onclick="calcClear()">AC</button>
         <button class="btn btn-op" onclick="calcOp('%')">%</button>
         <button class="btn btn-op" onclick="calcOp('÷')">÷</button>
-
         <button class="btn btn-num" onclick="calcNum('7')">7</button>
         <button class="btn btn-num" onclick="calcNum('8')">8</button>
         <button class="btn btn-num" onclick="calcNum('9')">9</button>
         <button class="btn btn-op" onclick="calcOp('×')">×</button>
-
         <button class="btn btn-num" onclick="calcNum('4')">4</button>
         <button class="btn btn-num" onclick="calcNum('5')">5</button>
         <button class="btn btn-num" onclick="calcNum('6')">6</button>
         <button class="btn btn-op" onclick="calcOp('−')">−</button>
-
         <button class="btn btn-num" onclick="calcNum('1')">1</button>
         <button class="btn btn-num" onclick="calcNum('2')">2</button>
         <button class="btn btn-num" onclick="calcNum('3')">3</button>
         <button class="btn btn-op" onclick="calcOp('+')">+</button>
-
         <button class="btn btn-num" onclick="calcNum('0')">0</button>
         <button class="btn btn-num" onclick="calcNum('.')">.</button>
         <button class="btn btn-clear" onclick="calcBack()">⌫</button>
@@ -345,34 +354,134 @@
     </div>
 
     <div class="card">
-      <h2><span class="icon">📊</span> Live Crypto Prices</h2>
+      <h2>📊 מחירי קריפטו</h2>
       <div class="crypto-strip" id="cryptoStrip"></div>
-      <div style="margin-top:18px;">
-        <h2 style="margin-bottom:10px;"><span class="icon">💡</span> Quick Money Facts</h2>
-        <div id="moneyFact" style="font-size:14px;color:#5f6368;line-height:1.6;padding:12px;background:#f8f9fa;border-radius:8px;"></div>
+      <div style="margin-top:16px;">
+        <h2 style="margin-bottom:8px;">💡 ידעת?</h2>
+        <div id="moneyFact" style="font-size:13px;color:#5f6368;line-height:1.6;padding:12px;background:#f8f9fa;border-radius:8px;"></div>
+      </div>
+      <div style="margin-top:16px;">
+        <h2 style="margin-bottom:8px;">₪ שקל היום</h2>
+        <div style="background:#e8f0fe;border-radius:8px;padding:12px;display:flex;justify-content:space-around;text-align:center;">
+          <div><div style="font-size:11px;color:#5f6368;">USD</div><div style="font-weight:700;color:#1a73e8;">₪3.72</div></div>
+          <div><div style="font-size:11px;color:#5f6368;">EUR</div><div style="font-weight:700;color:#1a73e8;">₪4.04</div></div>
+          <div><div style="font-size:11px;color:#5f6368;">GBP</div><div style="font-weight:700;color:#1a73e8;">₪4.71</div></div>
+        </div>
       </div>
     </div>
+  </div>
+
+  <!-- ══ BANK ACCOUNT ══ -->
+  <div class="section" id="tab-bank">
+
+    <!-- Summary row -->
+    <div class="card full" style="padding:16px 20px;">
+      <div class="bank-summary" id="bankSummary">
+        <div class="bank-sum-box">
+          <div class="bs-label">💳 יתרה נוכחית</div>
+          <div class="bs-val" id="bs-balance" style="color:#1a73e8;">₪0</div>
+          <div class="bs-sub">חשבון בנק</div>
+        </div>
+        <div class="bank-sum-box">
+          <div class="bs-label">📈 סה״כ הכנסות</div>
+          <div class="bs-val" id="bs-income" style="color:#137333;">₪0</div>
+          <div class="bs-sub" id="bs-income-count">0 עסקאות</div>
+        </div>
+        <div class="bank-sum-box">
+          <div class="bs-label">📉 סה״כ הוצאות</div>
+          <div class="bs-val" id="bs-expense" style="color:#d93025;">₪0</div>
+          <div class="bs-sub" id="bs-expense-count">0 עסקאות</div>
+        </div>
+        <div class="bank-sum-box">
+          <div class="bs-label">📊 חיסכון חודשי</div>
+          <div class="bs-val" id="bs-saving" style="color:#9334e6;">₪0</div>
+          <div class="bs-sub" id="bs-saving-pct">מהחודש הנוכחי</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add transaction -->
+    <div class="card">
+      <h2>➕ הוסף עסקה</h2>
+
+      <div class="type-toggle">
+        <button id="btn-income" class="active-income" onclick="setType('income')">📈 הכנסה</button>
+        <button id="btn-expense" onclick="setType('expense')">📉 הוצאה</button>
+      </div>
+
+      <div class="bank-form-row">
+        <label>סכום (₪)</label>
+        <input type="number" id="tx-amount" placeholder="0.00" min="0" step="0.01" />
+      </div>
+      <div class="bank-form-row">
+        <label>קטגוריה</label>
+        <select id="tx-category"></select>
+      </div>
+      <div class="bank-form-row">
+        <label>תיאור (אופציונלי)</label>
+        <input type="text" id="tx-desc" placeholder="למשל: משכורת ינואר" />
+      </div>
+      <div class="bank-form-row">
+        <label>תאריך</label>
+        <input type="date" id="tx-date" />
+      </div>
+
+      <button class="add-tx-btn income-btn" id="add-tx-btn" onclick="addTransaction()">+ הוסף הכנסה</button>
+    </div>
+
+    <!-- Balance chart -->
+    <div class="card">
+      <h2>📈 יתרה לאורך זמן</h2>
+      <div class="chart-container" id="balanceChartContainer">
+        <div class="chart-empty">
+          <span style="font-size:36px;">📊</span>
+          <span>הוסף עסקאות כדי לראות גרף</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly chart -->
+    <div class="card full">
+      <h2>📅 הכנסות מול הוצאות — לפי חודש</h2>
+      <div id="monthlyChartContainer">
+        <div class="chart-empty">
+          <span style="font-size:36px;">📆</span>
+          <span>הוסף עסקאות כדי לראות ניתוח חודשי</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction history -->
+    <div class="card full">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h2 style="margin-bottom:0;">🧾 היסטוריית עסקאות</h2>
+        <button onclick="clearAllTransactions()" style="background:#fce8e6;border:none;color:#d93025;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600;">מחק הכל</button>
+      </div>
+      <div id="txTableContainer">
+        <div class="no-tx">עדיין אין עסקאות. הוסף עסקה ראשונה למעלה 👆</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ══ CONVERT ══ -->
   <div class="section" id="tab-convert">
     <div class="card full">
-      <h2><span class="icon">🔄</span> Currency Converter</h2>
+      <h2>🔄 המרת מטבעות</h2>
       <div class="conv-row">
-        <input type="number" id="convAmt" value="1" min="0" step="any" oninput="convertCurrency()" />
+        <input type="number" id="convAmt" value="100" min="0" step="any" oninput="convertCurrency()" />
         <select id="convFrom" onchange="convertCurrency()"></select>
       </div>
       <div style="text-align:center;margin:4px 0;">
-        <button class="swap-btn" onclick="swapCurrencies()" title="Swap">⇅</button>
+        <button class="swap-btn" onclick="swapCurrencies()" title="החלף">⇅</button>
       </div>
       <div class="conv-row">
-        <input type="number" id="convResult" placeholder="Result" readonly />
+        <input type="number" id="convResult" placeholder="תוצאה" readonly />
         <select id="convTo" onchange="convertCurrency()"></select>
       </div>
       <div class="conv-result-box" id="convBox">—</div>
       <div class="conv-rate" id="convRate"></div>
-
-      <h2 style="margin-top:24px;margin-bottom:12px;"><span class="icon">📈</span> Multi-Currency Table</h2>
+      <h2 style="margin-top:20px;margin-bottom:10px;">📊 טבלת מטבעות</h2>
       <div id="multiTable"></div>
     </div>
   </div>
@@ -380,7 +489,7 @@
   <!-- ══ CURRENCY TYPES ══ -->
   <div class="section" id="tab-types">
     <div class="card full">
-      <h2><span class="icon">🌍</span> World Currencies</h2>
+      <h2>🌍 מטבעות העולם</h2>
       <div class="money-grid" id="moneyGrid"></div>
     </div>
   </div>
@@ -388,58 +497,57 @@
   <!-- ══ STATS ══ -->
   <div class="section" id="tab-stats">
     <div class="card">
-      <h2><span class="icon">📐</span> Compound Interest</h2>
+      <h2>📐 ריבית דריבית</h2>
       <div class="stat-inputs">
         <div class="stat-row">
-          <label>Principal ($)</label>
+          <label>קרן (₪)</label>
           <input type="number" id="siPrincipal" value="10000" />
         </div>
         <div class="stat-row">
-          <label>Annual Rate (%)</label>
+          <label>ריבית שנתית (%)</label>
           <input type="number" id="siRate" value="7" step="0.1" />
         </div>
         <div class="stat-row">
-          <label>Years</label>
+          <label>שנים</label>
           <input type="number" id="siYears" value="10" min="1" max="50" />
         </div>
         <div class="stat-row">
-          <label>Compound</label>
+          <label>תדירות</label>
           <select id="siComp">
-            <option value="1">Annually</option>
-            <option value="4">Quarterly</option>
-            <option value="12" selected>Monthly</option>
-            <option value="365">Daily</option>
+            <option value="1">שנתי</option>
+            <option value="4">רבעוני</option>
+            <option value="12" selected>חודשי</option>
+            <option value="365">יומי</option>
           </select>
         </div>
       </div>
-      <button class="calc-stats-btn" onclick="calcStats()">Calculate</button>
+      <button class="calc-stats-btn" onclick="calcStats()">חשב</button>
       <div class="stats-result" id="statsResult"></div>
     </div>
 
     <div class="card">
-      <h2><span class="icon">📊</span> Growth Chart</h2>
+      <h2>📊 גרף צמיחה</h2>
       <div class="bar-chart" id="barChart"></div>
-      <div style="display:flex;gap:12px;margin-top:10px;font-size:12px;color:#5f6368;">
-        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:#1a73e8;border-radius:2px;display:inline-block;"></span> Principal</span>
-        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:#34a853;border-radius:2px;display:inline-block;"></span> Interest</span>
+      <div class="legend" style="margin-top:8px;">
+        <span><span class="legend-dot" style="background:#1a73e8;"></span> קרן</span>
+        <span><span class="legend-dot" style="background:#34a853;"></span> ריבית</span>
       </div>
-
-      <h2 style="margin-top:20px;margin-bottom:14px;"><span class="icon">🧾</span> Loan / EMI</h2>
+      <h2 style="margin-top:18px;margin-bottom:12px;">🧾 הלוואה / החזר חודשי</h2>
       <div class="stat-inputs">
         <div class="stat-row">
-          <label>Loan Amount ($)</label>
-          <input type="number" id="loanAmt" value="20000" />
+          <label>סכום הלוואה (₪)</label>
+          <input type="number" id="loanAmt" value="100000" />
         </div>
         <div class="stat-row">
-          <label>Annual Rate (%)</label>
-          <input type="number" id="loanRate" value="5" step="0.1" />
+          <label>ריבית שנתית (%)</label>
+          <input type="number" id="loanRate" value="4" step="0.1" />
         </div>
         <div class="stat-row">
-          <label>Tenure (months)</label>
+          <label>תקופה (חודשים)</label>
           <input type="number" id="loanMonths" value="60" />
         </div>
       </div>
-      <button class="calc-stats-btn" onclick="calcEMI()">Calculate EMI</button>
+      <button class="calc-stats-btn" onclick="calcEMI()">חשב החזר</button>
       <div class="stats-result" id="emiResult"></div>
     </div>
   </div>
@@ -451,13 +559,14 @@
    DATA
 ══════════════════════════════════════════════ */
 const FX = {
-  USD:1, EUR:.92, GBP:.79, JPY:149.5, INR:83.2, CNY:7.24, CAD:1.36,
-  AUD:1.53, CHF:.90, BRL:4.97, MXN:17.15, KRW:1325, SGD:1.34, HKD:7.82,
-  SEK:10.42, NOK:10.65, DKK:6.88, NZD:1.63, ZAR:18.6, THB:35.1,
-  AED:3.67, SAR:3.75, TRY:32.0, RUB:92.5, PLN:4.0
+  ILS:3.72, USD:1, EUR:.92, GBP:.79, JPY:149.5, INR:83.2, CNY:7.24,
+  CAD:1.36, AUD:1.53, CHF:.90, BRL:4.97, MXN:17.15, KRW:1325, SGD:1.34,
+  HKD:7.82, SEK:10.42, NOK:10.65, DKK:6.88, NZD:1.63, ZAR:18.6,
+  THB:35.1, AED:3.67, SAR:3.75, TRY:32.0, RUB:92.5, PLN:4.0
 };
 
 const CURRENCIES = [
+  {code:"ILS",name:"Israeli Shekel",flag:"🇮🇱"},
   {code:"USD",name:"US Dollar",flag:"🇺🇸"},
   {code:"EUR",name:"Euro",flag:"🇪🇺"},
   {code:"GBP",name:"British Pound",flag:"🇬🇧"},
@@ -485,27 +594,49 @@ const CURRENCIES = [
   {code:"PLN",name:"Polish Zloty",flag:"🇵🇱"},
 ];
 
+const CATS = {
+  income: [
+    {icon:"💼", label:"משכורת"},
+    {icon:"💻", label:"פרילנס"},
+    {icon:"🏠", label:"הכנסה משכירות"},
+    {icon:"📈", label:"השקעות"},
+    {icon:"🎁", label:"מתנה"},
+    {icon:"💰", label:"אחר"},
+  ],
+  expense: [
+    {icon:"🏠", label:"שכירות / משכנתא"},
+    {icon:"🍔", label:"מזון"},
+    {icon:"🚗", label:"תחבורה"},
+    {icon:"🎉", label:"בילויים"},
+    {icon:"📄", label:"חשבונות"},
+    {icon:"🛍️", label:"קניות"},
+    {icon:"💊", label:"בריאות"},
+    {icon:"📚", label:"חינוך"},
+    {icon:"✂️", label:"טיפוח"},
+    {icon:"💰", label:"אחר"},
+  ]
+};
+
 const CRYPTO = [
   {icon:"₿",name:"BTC",price:67420,chg:+2.3},
   {icon:"Ξ",name:"ETH",price:3540,chg:-0.8},
   {icon:"◎",name:"SOL",price:172,chg:+5.1},
-  {icon:"Ł",name:"LTC",price:84,chg:+1.2},
   {icon:"✕",name:"XRP",price:0.62,chg:-1.4},
   {icon:"◆",name:"BNB",price:412,chg:+0.5},
   {icon:"🌕",name:"DOGE",price:0.14,chg:+3.9},
 ];
 
 const FACTS = [
-  "The U.S. dollar is the world's primary reserve currency, used in ~60% of global foreign exchange reserves.",
-  "The first paper money was invented in China around 700 AD during the Tang Dynasty.",
-  "The Federal Reserve was created in 1913 to stabilize the U.S. banking system.",
-  "Gold has been used as money for over 2,500 years.",
-  "Credit cards were first introduced in the 1950s by Diners Club.",
-  "Bitcoin's total supply is capped at 21 million coins.",
-  "The Euro is used by 20 out of 27 EU member states.",
-  "Compound interest doubles money roughly every (72 ÷ rate%) years — the Rule of 72.",
-  "More than 180 currencies are recognized by the UN as legal tender.",
-  "The U.S. penny costs about 2.7 cents to produce.",
+  "השקל הישראלי החדש (ILS) הונהג ב-1986 והחליף את השקל הישן ביחס של 1,000 לאחד.",
+  "ישראל היא המדינה הראשונה בעולם שהשיקה מטבע דיגיטלי של בנק מרכזי בניסוי — ה'שקל הדיגיטלי'.",
+  "הדולר האמריקאי הוא מטבע הרזרבה העיקרי בעולם — כ-60% מהיתרות הגלובליות.",
+  "כסף נייר הומצא בסין לפני כ-1,300 שנה בתקופת שושלת טאנג.",
+  "ריבית דריבית מכפילה כסף בערך כל (72 ÷ % ריבית) שנים — כלל 72.",
+  "ביטקוין מוגבל ל-21 מיליון מטבעות בלבד.",
+  "יש יותר מ-180 מטבעות רשמיים בעולם.",
+  "כרטיסי אשראי הומצאו בשנות ה-50 על ידי Diners Club.",
+  "זהב שימש כסף במשך למעלה מ-2,500 שנה.",
+  "ניירות ערך נסחרו לראשונה בבורסה של אמסטרדם ב-1602.",
 ];
 
 /* ══════════════════════════════════════════════
@@ -517,6 +648,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'bank') renderBankUI();
   });
 });
 
@@ -557,34 +689,42 @@ function calcEquals() {
     calcExpr = String(result);
     calcNew = true;
   } catch {
-    document.getElementById('calcResult').textContent = 'Error';
+    document.getElementById('calcResult').textContent = 'שגיאה';
     calcExpr = ''; calcNew = true;
   }
 }
+document.addEventListener('keydown', e => {
+  if (document.querySelector('.tab-btn.active')?.dataset.tab !== 'calc') return;
+  const k = e.key;
+  if ('0123456789.'.includes(k)) calcNum(k);
+  else if (k==='+') calcOp('+');
+  else if (k==='-') calcOp('−');
+  else if (k==='*') calcOp('×');
+  else if (k==='/') { e.preventDefault(); calcOp('÷'); }
+  else if (k==='%') calcOp('%');
+  else if (k==='Enter'||k==='=') calcEquals();
+  else if (k==='Backspace') calcBack();
+  else if (k==='Escape') calcClear();
+});
 
 /* ══════════════════════════════════════════════
-   CRYPTO STRIP
+   CRYPTO + FACTS
 ══════════════════════════════════════════════ */
 function renderCrypto() {
-  const strip = document.getElementById('cryptoStrip');
-  strip.innerHTML = CRYPTO.map(c => `
+  document.getElementById('cryptoStrip').innerHTML = CRYPTO.map(c => `
     <div class="crypto-chip">
       <span class="c-icon">${c.icon}</span>
       <div>
         <div class="c-name">${c.name}</div>
         <div class="c-price">$${c.price.toLocaleString()}</div>
       </div>
-      <span class="c-chg ${c.chg >= 0 ? 'c-up' : 'c-dn'}">${c.chg >= 0 ? '+' : ''}${c.chg}%</span>
+      <span class="${c.chg>=0?'c-up':'c-dn'}">${c.chg>=0?'+':''}${c.chg}%</span>
     </div>`).join('');
 }
-
-/* ══════════════════════════════════════════════
-   MONEY FACT ROTATOR
-══════════════════════════════════════════════ */
 let factIdx = 0;
 function rotateFact() {
   document.getElementById('moneyFact').textContent = FACTS[factIdx];
-  factIdx = (factIdx + 1) % FACTS.length;
+  factIdx = (factIdx+1) % FACTS.length;
 }
 
 /* ══════════════════════════════════════════════
@@ -594,9 +734,9 @@ function populateSelects() {
   const opts = CURRENCIES.map(c => `<option value="${c.code}">${c.flag} ${c.code} – ${c.name}</option>`).join('');
   document.getElementById('convFrom').innerHTML = opts;
   document.getElementById('convTo').innerHTML = opts;
-  document.getElementById('convTo').value = 'EUR';
+  document.getElementById('convFrom').value = 'ILS';
+  document.getElementById('convTo').value = 'USD';
 }
-
 function convertCurrency() {
   const amt = parseFloat(document.getElementById('convAmt').value) || 0;
   const from = document.getElementById('convFrom').value;
@@ -612,7 +752,6 @@ function convertCurrency() {
     `1 ${from} = ${rate.toFixed(6)} ${to}  ·  1 ${to} = ${(1/rate).toFixed(6)} ${from}`;
   renderMultiTable(amt, from);
 }
-
 function swapCurrencies() {
   const f = document.getElementById('convFrom').value;
   const t = document.getElementById('convTo').value;
@@ -620,170 +759,372 @@ function swapCurrencies() {
   document.getElementById('convTo').value = f;
   convertCurrency();
 }
-
 function renderMultiTable(amt, from) {
-  const majors = ['USD','EUR','GBP','JPY','INR','CNY','CAD','AUD','CHF','BRL'];
+  const majors = ['ILS','USD','EUR','GBP','JPY','CNY','CAD','AUD','CHF','BRL'];
   const rows = majors.map(code => {
     const c = CURRENCIES.find(x=>x.code===code);
     const rate = FX[code] / FX[from];
     return `<tr>
-      <td style="padding:8px 12px;font-size:18px;">${c.flag}</td>
+      <td style="padding:8px 10px;font-size:17px;">${c.flag}</td>
       <td style="padding:8px 4px;font-weight:600;">${code}</td>
-      <td style="padding:8px 4px;color:#5f6368;font-size:13px;">${c.name}</td>
-      <td style="padding:8px 12px;text-align:right;font-weight:600;color:#1a73e8;">
+      <td style="padding:8px 4px;color:#5f6368;font-size:12px;">${c.name}</td>
+      <td style="padding:8px 10px;text-align:right;font-weight:600;color:#1a73e8;">
         ${(amt*rate).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:4})}
       </td>
     </tr>`;
   }).join('');
   document.getElementById('multiTable').innerHTML =
     `<table style="width:100%;border-collapse:collapse;">
-       <thead><tr style="background:#f8f9fa;font-size:12px;color:#80868b;text-transform:uppercase;">
-         <th style="padding:8px 12px;text-align:left;" colspan="3">Currency</th>
-         <th style="padding:8px 12px;text-align:right;">Value</th>
-       </tr></thead>
-       <tbody>${rows}</tbody>
-     </table>`;
+       <thead><tr style="background:#f8f9fa;font-size:11px;color:#80868b;text-transform:uppercase;">
+         <th style="padding:8px 10px;text-align:left;" colspan="3">מטבע</th>
+         <th style="padding:8px 10px;text-align:right;">ערך</th>
+       </tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 /* ══════════════════════════════════════════════
-   CURRENCY TYPES GRID
+   MONEY GRID
 ══════════════════════════════════════════════ */
 function renderMoneyGrid() {
-  const grid = document.getElementById('moneyGrid');
-  grid.innerHTML = CURRENCIES.map(c => `
-    <div class="money-card" onclick="selectCurrency('${c.code}',this)">
+  document.getElementById('moneyGrid').innerHTML = CURRENCIES.map(c => `
+    <div class="money-card" onclick="this.parentElement.querySelectorAll('.money-card').forEach(x=>x.classList.remove('selected'));this.classList.add('selected')">
       <span class="flag">${c.flag}</span>
       <div class="code">${c.code}</div>
       <div class="name">${c.name}</div>
-      <div class="rate">1 USD = ${FX[c.code]} ${c.code}</div>
+      <div class="rate">₪1 = ${(FX[c.code]/FX['ILS']).toFixed(4)} ${c.code}</div>
     </div>`).join('');
 }
 
-function selectCurrency(code, el) {
-  document.querySelectorAll('.money-card').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-}
-
 /* ══════════════════════════════════════════════
-   STATS – COMPOUND INTEREST
+   STATS
 ══════════════════════════════════════════════ */
-function fmt(n) {
-  return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+function fmt(n) { return n.toLocaleString('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtShort(n) {
+  const abs = Math.abs(n);
+  if (abs >= 1000000) return (n/1000000).toFixed(1)+'M';
+  if (abs >= 1000) return (n/1000).toFixed(0)+'K';
+  return Math.round(n).toString();
 }
 
 function calcStats() {
-  const P = parseFloat(document.getElementById('siPrincipal').value) || 0;
-  const r = parseFloat(document.getElementById('siRate').value) / 100 || 0;
-  const t = parseFloat(document.getElementById('siYears').value) || 1;
+  const P = parseFloat(document.getElementById('siPrincipal').value)||0;
+  const r = parseFloat(document.getElementById('siRate').value)/100||0;
+  const t = parseFloat(document.getElementById('siYears').value)||1;
   const n = parseInt(document.getElementById('siComp').value);
-
-  const A = P * Math.pow(1 + r/n, n*t);
+  const A = P * Math.pow(1+r/n, n*t);
   const interest = A - P;
-  const simple = P * r * t;
-  const rule72 = r > 0 ? (72 / (r*100)).toFixed(1) : '—';
-
+  const rule72 = r > 0 ? (72/(r*100)).toFixed(1) : '—';
   document.getElementById('statsResult').innerHTML = `
-    <div class="stat-box">
-      <div class="s-label">Final Amount</div>
-      <div class="s-val">$${fmt(A)}</div>
-      <div class="s-sub">after ${t} years</div>
-    </div>
-    <div class="stat-box">
-      <div class="s-label">Total Interest</div>
-      <div class="s-val" style="color:#34a853;">$${fmt(interest)}</div>
-      <div class="s-sub">${((interest/P)*100).toFixed(1)}% gain</div>
-    </div>
-    <div class="stat-box">
-      <div class="s-label">Simple Interest</div>
-      <div class="s-val" style="color:#ea8600;">$${fmt(simple)}</div>
-      <div class="s-sub">for comparison</div>
-    </div>
-    <div class="stat-box">
-      <div class="s-label">Doubles In</div>
-      <div class="s-val" style="color:#9334e6;">${rule72} yrs</div>
-      <div class="s-sub">Rule of 72</div>
-    </div>`;
-
-  renderBarChart(P, r, n, t);
+    <div class="stat-box"><div class="s-label">סכום סופי</div><div class="s-val">₪${fmt(A)}</div><div class="s-sub">אחרי ${t} שנים</div></div>
+    <div class="stat-box"><div class="s-label">ריבית שנצברה</div><div class="s-val" style="color:#34a853;">₪${fmt(interest)}</div><div class="s-sub">${((interest/P)*100).toFixed(1)}% רווח</div></div>
+    <div class="stat-box"><div class="s-label">ריבית פשוטה</div><div class="s-val" style="color:#ea8600;">₪${fmt(P*r*t)}</div><div class="s-sub">להשוואה</div></div>
+    <div class="stat-box"><div class="s-label">מכפיל תוך</div><div class="s-val" style="color:#9334e6;">${rule72} שנים</div><div class="s-sub">כלל 72</div></div>`;
+  renderBarChart(P,r,n,t);
 }
-
-function renderBarChart(P, r, n, t) {
-  const years = Math.min(t, 10);
-  const chart = document.getElementById('barChart');
-  const data = Array.from({length:years}, (_,i) => {
-    const A = P * Math.pow(1 + r/n, n*(i+1));
-    return {year:i+1, principal:P, interest:A-P, total:A};
+function renderBarChart(P,r,n,t) {
+  const years = Math.min(t,10);
+  const data = Array.from({length:years},(_,i)=>{
+    const A = P*Math.pow(1+r/n,n*(i+1));
+    return {year:i+1,principal:P,interest:A-P,total:A};
   });
   const maxVal = Math.max(...data.map(d=>d.total));
-  chart.innerHTML = data.map(d => {
-    const pH = (d.principal/maxVal*90).toFixed(1);
-    const iH = (d.interest/maxVal*90).toFixed(1);
+  document.getElementById('barChart').innerHTML = data.map(d=>{
+    const pH = (d.principal/maxVal*85).toFixed(1);
+    const iH = (d.interest/maxVal*85).toFixed(1);
     return `<div class="bar-wrap">
       <div style="display:flex;flex-direction:column;align-items:center;width:100%;">
         <div class="bar interest" style="height:${iH}px;width:100%;"></div>
         <div class="bar" style="height:${pH}px;width:100%;border-radius:0 0 4px 4px;"></div>
       </div>
-      <div class="bar-lbl">Y${d.year}</div>
+      <div class="bar-lbl">S${d.year}</div>
     </div>`;
   }).join('');
 }
-
-/* ══════════════════════════════════════════════
-   STATS – EMI CALCULATOR
-══════════════════════════════════════════════ */
 function calcEMI() {
-  const P = parseFloat(document.getElementById('loanAmt').value) || 0;
-  const r = parseFloat(document.getElementById('loanRate').value) / 100 / 12 || 0;
-  const n = parseInt(document.getElementById('loanMonths').value) || 1;
-
-  const emi = r === 0 ? P/n : P * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1);
-  const total = emi * n;
-  const totalInterest = total - P;
-
+  const P = parseFloat(document.getElementById('loanAmt').value)||0;
+  const r = parseFloat(document.getElementById('loanRate').value)/100/12||0;
+  const n = parseInt(document.getElementById('loanMonths').value)||1;
+  const emi = r===0 ? P/n : P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+  const total = emi*n;
+  const ti = total-P;
   document.getElementById('emiResult').innerHTML = `
-    <div class="stat-box">
-      <div class="s-label">Monthly EMI</div>
-      <div class="s-val">$${fmt(emi)}</div>
-      <div class="s-sub">per month</div>
-    </div>
-    <div class="stat-box">
-      <div class="s-label">Total Payment</div>
-      <div class="s-val" style="color:#ea8600;">$${fmt(total)}</div>
-      <div class="s-sub">${n} payments</div>
-    </div>
-    <div class="stat-box">
-      <div class="s-label">Total Interest</div>
-      <div class="s-val" style="color:#d93025;">$${fmt(totalInterest)}</div>
-      <div class="s-sub">${((totalInterest/P)*100).toFixed(1)}% of loan</div>
-    </div>
-    <div class="stat-box">
-      <div class="s-label">Principal</div>
-      <div class="s-val" style="color:#1a73e8;">$${fmt(P)}</div>
-      <div class="s-sub">${((P/total)*100).toFixed(1)}% of total</div>
-    </div>`;
+    <div class="stat-box"><div class="s-label">החזר חודשי</div><div class="s-val">₪${fmt(emi)}</div><div class="s-sub">לחודש</div></div>
+    <div class="stat-box"><div class="s-label">סה״כ תשלומים</div><div class="s-val" style="color:#ea8600;">₪${fmt(total)}</div><div class="s-sub">${n} תשלומים</div></div>
+    <div class="stat-box"><div class="s-label">סה״כ ריבית</div><div class="s-val" style="color:#d93025;">₪${fmt(ti)}</div><div class="s-sub">${((ti/P)*100).toFixed(1)}% מהקרן</div></div>
+    <div class="stat-box"><div class="s-label">קרן</div><div class="s-val" style="color:#1a73e8;">₪${fmt(P)}</div><div class="s-sub">${((P/total)*100).toFixed(1)}% מהסך</div></div>`;
 }
 
 /* ══════════════════════════════════════════════
-   KEYBOARD SUPPORT
+   BANK ACCOUNT
 ══════════════════════════════════════════════ */
-document.addEventListener('keydown', e => {
-  const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab;
-  if (activeTab !== 'calc') return;
-  const key = e.key;
-  if ('0123456789.'.includes(key)) calcNum(key);
-  else if (key === '+') calcOp('+');
-  else if (key === '-') calcOp('−');
-  else if (key === '*') calcOp('×');
-  else if (key === '/') { e.preventDefault(); calcOp('÷'); }
-  else if (key === '%') calcOp('%');
-  else if (key === 'Enter' || key === '=') calcEquals();
-  else if (key === 'Backspace') calcBack();
-  else if (key === 'Escape') calcClear();
-});
+let txType = 'income';
+
+function getBankData() { return JSON.parse(localStorage.getItem('bankData')||'[]'); }
+function saveBankData(d) { localStorage.setItem('bankData', JSON.stringify(d)); }
+
+function setType(type) {
+  txType = type;
+  const bi = document.getElementById('btn-income');
+  const be = document.getElementById('btn-expense');
+  const btn = document.getElementById('add-tx-btn');
+  if (type === 'income') {
+    bi.className = 'active-income';
+    be.className = '';
+    btn.className = 'add-tx-btn income-btn';
+    btn.textContent = '+ הוסף הכנסה';
+  } else {
+    bi.className = '';
+    be.className = 'active-expense';
+    btn.className = 'add-tx-btn expense-btn';
+    btn.textContent = '+ הוסף הוצאה';
+  }
+  renderCategorySelect();
+}
+
+function renderCategorySelect() {
+  const sel = document.getElementById('tx-category');
+  sel.innerHTML = CATS[txType].map(c => `<option value="${c.icon} ${c.label}">${c.icon} ${c.label}</option>`).join('');
+}
+
+function addTransaction() {
+  const amount = parseFloat(document.getElementById('tx-amount').value);
+  if (!amount || amount <= 0) {
+    document.getElementById('tx-amount').style.borderColor = '#d93025';
+    setTimeout(()=>document.getElementById('tx-amount').style.borderColor='',1500);
+    return;
+  }
+  const data = getBankData();
+  data.push({
+    id: Date.now(),
+    type: txType,
+    amount,
+    category: document.getElementById('tx-category').value,
+    desc: document.getElementById('tx-desc').value.trim(),
+    date: document.getElementById('tx-date').value || new Date().toISOString().slice(0,10)
+  });
+  saveBankData(data);
+  document.getElementById('tx-amount').value = '';
+  document.getElementById('tx-desc').value = '';
+  renderBankUI();
+}
+
+function deleteTransaction(id) {
+  const data = getBankData().filter(t => t.id !== id);
+  saveBankData(data);
+  renderBankUI();
+}
+
+function clearAllTransactions() {
+  if (confirm('האם למחוק את כל העסקאות?')) {
+    saveBankData([]);
+    renderBankUI();
+  }
+}
+
+function renderBankUI() {
+  const data = getBankData();
+
+  // Summary
+  const totalIncome  = data.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const totalExpense = data.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const balance = totalIncome - totalExpense;
+
+  // This month saving
+  const now = new Date();
+  const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const mInc = data.filter(t=>t.type==='income'&&t.date.startsWith(thisMonth)).reduce((s,t)=>s+t.amount,0);
+  const mExp = data.filter(t=>t.type==='expense'&&t.date.startsWith(thisMonth)).reduce((s,t)=>s+t.amount,0);
+  const mSave = mInc - mExp;
+
+  document.getElementById('bs-balance').textContent = '₪' + fmt(balance);
+  document.getElementById('bs-balance').style.color = balance >= 0 ? '#1a73e8' : '#d93025';
+  document.getElementById('bs-income').textContent  = '₪' + fmt(totalIncome);
+  document.getElementById('bs-expense').textContent = '₪' + fmt(totalExpense);
+  document.getElementById('bs-income-count').textContent  = data.filter(t=>t.type==='income').length + ' עסקאות';
+  document.getElementById('bs-expense-count').textContent = data.filter(t=>t.type==='expense').length + ' עסקאות';
+  document.getElementById('bs-saving').textContent = (mSave>=0?'+':'') + '₪' + fmt(mSave);
+  document.getElementById('bs-saving').style.color = mSave >= 0 ? '#137333' : '#d93025';
+
+  renderBalanceChart(data);
+  renderMonthlyChart(data);
+  renderTxTable(data);
+}
+
+/* ── Balance Line Chart (SVG) ── */
+function renderBalanceChart(data) {
+  const container = document.getElementById('balanceChartContainer');
+  if (data.length === 0) {
+    container.innerHTML = '<div class="chart-empty"><span style="font-size:36px;">📊</span><span>הוסף עסקאות כדי לראות גרף</span></div>';
+    return;
+  }
+
+  const sorted = [...data].sort((a,b)=>a.date.localeCompare(b.date));
+  let running = 0;
+  const points = [{date:'', balance:0, label:'התחלה'}];
+  sorted.forEach(t => {
+    running += t.type==='income' ? t.amount : -t.amount;
+    // Format date label
+    const d = new Date(t.date);
+    const label = `${d.getDate()}/${d.getMonth()+1}`;
+    points.push({date: t.date, balance: running, label});
+  });
+
+  const W=560, H=170, PL=58, PR=16, PT=14, PB=28;
+  const pW = W-PL-PR, pH = H-PT-PB;
+  const minY = Math.min(...points.map(p=>p.balance));
+  const maxY = Math.max(...points.map(p=>p.balance));
+  const rangeY = maxY - minY || 1;
+
+  const toX = i => PL + (i/(points.length-1||1)) * pW;
+  const toY = b => PT + (1-(b-minY)/rangeY) * pH;
+
+  const pathD = points.map((p,i)=>`${i===0?'M':'L'}${toX(i).toFixed(1)},${toY(p.balance).toFixed(1)}`).join(' ');
+
+  // Gradient area fill
+  const areaD = pathD + ` L${toX(points.length-1)},${PT+pH} L${toX(0)},${PT+pH} Z`;
+
+  // Zero line
+  const zeroSvgY = toY(Math.max(minY, Math.min(maxY, 0)));
+
+  // Y axis ticks
+  const yTicks = 4;
+  const yTicksArr = Array.from({length:yTicks+1},(_,i)=>{
+    const val = minY + (i/yTicks)*rangeY;
+    return {svgY: toY(val).toFixed(1), val};
+  });
+
+  // X axis labels: show ~4 evenly spaced
+  const xStep = Math.max(1, Math.floor((points.length-1)/4));
+  const xLabels = [];
+  for (let i=0; i<points.length; i+=xStep) xLabels.push({svgX:toX(i).toFixed(1), label:points[i].label});
+  if (xLabels[xLabels.length-1].label !== points[points.length-1].label) {
+    xLabels.push({svgX:toX(points.length-1).toFixed(1), label:points[points.length-1].label});
+  }
+
+  // Determine line color (positive = blue, negative = red)
+  const finalBalance = points[points.length-1].balance;
+  const lineColor = finalBalance >= 0 ? '#1a73e8' : '#d93025';
+  const fillColor = finalBalance >= 0 ? '#1a73e8' : '#d93025';
+
+  const svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;">
+    <defs>
+      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${fillColor}" stop-opacity="0.25"/>
+        <stop offset="100%" stop-color="${fillColor}" stop-opacity="0.03"/>
+      </linearGradient>
+    </defs>
+    ${yTicksArr.map(t=>`<line x1="${PL}" y1="${t.svgY}" x2="${W-PR}" y2="${t.svgY}" stroke="#f0f0f0" stroke-width="1"/>`).join('')}
+    <line x1="${PL}" y1="${zeroSvgY}" x2="${W-PR}" y2="${zeroSvgY}" stroke="#dadce0" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <path d="${areaD}" fill="url(#areaGrad)"/>
+    <path d="${pathD}" fill="none" stroke="${lineColor}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${points.map((p,i)=>`<circle cx="${toX(i).toFixed(1)}" cy="${toY(p.balance).toFixed(1)}" r="${i===0||i===points.length-1?4:2.5}" fill="${p.balance>=0?'#1a73e8':'#d93025'}" stroke="#fff" stroke-width="1.5"/>`).join('')}
+    ${yTicksArr.map(t=>`<text x="${PL-5}" y="${parseFloat(t.svgY)+4}" text-anchor="end" font-size="9.5" fill="#80868b">₪${fmtShort(t.val)}</text>`).join('')}
+    ${xLabels.map(l=>`<text x="${l.svgX}" y="${H-5}" text-anchor="middle" font-size="9.5" fill="#80868b">${l.label}</text>`).join('')}
+    <line x1="${PL}" y1="${PT}" x2="${PL}" y2="${H-PB}" stroke="#e8eaed" stroke-width="1"/>
+    <line x1="${PL}" y1="${H-PB}" x2="${W-PR}" y2="${H-PB}" stroke="#e8eaed" stroke-width="1"/>
+  </svg>
+  <div style="display:flex;justify-content:flex-end;font-size:11px;color:#5f6368;margin-top:4px;">
+    יתרה סופית: <strong style="margin-right:4px;color:${finalBalance>=0?'#137333':'#d93025'};">₪${fmt(finalBalance)}</strong>
+  </div>`;
+
+  container.innerHTML = svg;
+}
+
+/* ── Monthly Income vs Expense Chart ── */
+function renderMonthlyChart(data) {
+  const container = document.getElementById('monthlyChartContainer');
+  if (data.length === 0) {
+    container.innerHTML = '<div class="chart-empty"><span style="font-size:36px;">📆</span><span>הוסף עסקאות כדי לראות ניתוח חודשי</span></div>';
+    return;
+  }
+
+  const months = {};
+  data.forEach(t => {
+    const m = t.date.substring(0,7);
+    if (!months[m]) months[m] = {income:0,expense:0};
+    months[m][t.type] += t.amount;
+  });
+
+  const sortedKeys = Object.keys(months).sort().slice(-8);
+  const maxVal = Math.max(...sortedKeys.map(k=>Math.max(months[k].income, months[k].expense)),1);
+
+  const heMonths = ['ינו','פב','מרץ','אפר','מאי','יונ','יול','אוג','ספט','אוק','נוב','דצ'];
+
+  const bars = sortedKeys.map(key => {
+    const [y,m] = key.split('-');
+    const label = `${heMonths[parseInt(m)-1]} ${y.slice(2)}`;
+    const iH = Math.max(3, (months[key].income/maxVal*110)).toFixed(1);
+    const eH = Math.max(3, (months[key].expense/maxVal*110)).toFixed(1);
+    const net = months[key].income - months[key].expense;
+    return `<div class="month-group">
+      <div class="month-bars">
+        <div class="month-bar inc" style="height:${iH}px;" title="הכנסות: ₪${fmt(months[key].income)}"></div>
+        <div class="month-bar exp" style="height:${eH}px;" title="הוצאות: ₪${fmt(months[key].expense)}"></div>
+      </div>
+      <div class="month-lbl">${label}</div>
+      <div style="font-size:9px;color:${net>=0?'#137333':'#d93025'};font-weight:600;">${net>=0?'+':''}₪${fmtShort(net)}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="monthly-bars">${bars}</div>
+    <div class="legend" style="margin-top:10px;">
+      <span><span class="legend-dot" style="background:#34a853;"></span> הכנסות</span>
+      <span><span class="legend-dot" style="background:#ea4335;"></span> הוצאות</span>
+      <span style="color:#80868b;">— המספר מתחת = נטו לחודש</span>
+    </div>`;
+}
+
+/* ── Transaction Table ── */
+function renderTxTable(data) {
+  const container = document.getElementById('txTableContainer');
+  if (data.length === 0) {
+    container.innerHTML = '<div class="no-tx">עדיין אין עסקאות. הוסף עסקה ראשונה למעלה 👆</div>';
+    return;
+  }
+
+  const sorted = [...data].sort((a,b)=>b.date.localeCompare(a.date));
+  // Compute running balance in date order
+  const chronological = [...data].sort((a,b)=>a.date.localeCompare(b.date)||(a.id-b.id));
+  let running = 0;
+  const balMap = {};
+  chronological.forEach(t => {
+    running += t.type==='income' ? t.amount : -t.amount;
+    balMap[t.id] = running;
+  });
+
+  const rows = sorted.map(t => {
+    const d = new Date(t.date);
+    const dateStr = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+    const bal = balMap[t.id];
+    const sign = t.type==='income' ? '+' : '-';
+    return `<tr class="tx-row-${t.type}">
+      <td style="color:#80868b;font-size:12px;">${dateStr}</td>
+      <td><span class="tx-cat-badge">${t.category}</span></td>
+      <td style="color:#5f6368;font-size:12px;">${t.desc||'—'}</td>
+      <td class="tx-amount">${sign}₪${fmt(t.amount)}</td>
+      <td class="${bal>=0?'tx-bal-pos':'tx-bal-neg'}">₪${fmt(bal)}</td>
+      <td><button class="del-btn" onclick="deleteTransaction(${t.id})" title="מחק">🗑</button></td>
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `<div style="overflow-x:auto;">
+    <table class="tx-table">
+      <thead><tr>
+        <th>תאריך</th><th>קטגוריה</th><th>תיאור</th>
+        <th>סכום</th><th>יתרה</th><th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
 
 /* ══════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════ */
+// Set default date to today
+document.getElementById('tx-date').value = new Date().toISOString().slice(0,10);
+renderCategorySelect();
+
 renderCrypto();
 rotateFact();
 setInterval(rotateFact, 6000);
@@ -791,6 +1132,7 @@ populateSelects();
 convertCurrency();
 renderMoneyGrid();
 calcStats();
+renderBankUI();
 </script>
 </body>
 </html>
