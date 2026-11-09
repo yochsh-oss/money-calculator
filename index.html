@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Money Calculator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f1f3f4;
+      color: #202124;
+      min-height: 100vh;
+    }
+
+    /* ── Top bar ── */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #dadce0;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,.12);
+    }
+    header .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #1a73e8;
+    }
+    header .logo span { font-size: 26px; }
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .tab-btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 20px;
+      background: transparent;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #5f6368;
+      transition: background .15s, color .15s;
+    }
+    .tab-btn.active {
+      background: #e8f0fe;
+      color: #1a73e8;
+    }
+    .tab-btn:hover:not(.active) { background: #f1f3f4; }
+
+    /* ── Layout ── */
+    main {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .full { grid-column: 1 / -1; }
+
+    /* ── Cards ── */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.1);
+    }
+    .card h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #3c4043;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card h2 .icon { font-size: 20px; }
+
+    /* ── Sections (tab panels) ── */
+    .section { display: none; }
+    .section.active { display: contents; }
+
+    /* ── Calculator ── */
+    .calc-display {
+      background: #f8f9fa;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: right;
+      margin-bottom: 12px;
+    }
+    .calc-expr {
+      font-size: 13px;
+      color: #80868b;
+      min-height: 20px;
+      word-break: break-all;
+    }
+    .calc-result {
+      font-size: 36px;
+      font-weight: 300;
+      color: #202124;
+      word-break: break-all;
+    }
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .btn {
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 16px 0;
+      transition: filter .1s, transform .08s;
+      font-weight: 500;
+    }
+    .btn:active { transform: scale(.95); }
+    .btn-num  { background: #f1f3f4; color: #202124; }
+    .btn-num:hover  { filter: brightness(.93); }
+    .btn-op   { background: #e8f0fe; color: #1a73e8; }
+    .btn-op:hover   { filter: brightness(.93); }
+    .btn-eq   { background: #1a73e8; color: #fff; }
+    .btn-eq:hover   { filter: brightness(.9); }
+    .btn-clear { background: #fce8e6; color: #d93025; }
+    .btn-clear:hover { filter: brightness(.93); }
+    .span2 { grid-column: span 2; }
+
+    /* ── Currency Converter ── */
+    .conv-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .conv-row input, .conv-row select {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: border .15s;
+    }
+    .conv-row input:focus, .conv-row select:focus { border-color: #1a73e8; }
+    .swap-btn {
+      background: #e8f0fe;
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+      flex-shrink: 0;
+    }
+    .swap-btn:hover { background: #d2e3fc; }
+    .conv-result-box {
+      background: #e6f4ea;
+      border-radius: 8px;
+      padding: 14px 16px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+      color: #137333;
+      margin-top: 10px;
+    }
+    .conv-rate {
+      text-align: center;
+      font-size: 12px;
+      color: #80868b;
+      margin-top: 6px;
+    }
+
+    /* ── Money Types ── */
+    .money-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .money-card {
+      border: 1px solid #dadce0;
+      border-radius: 10px;
+      padding: 14px;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .money-card:hover { border-color: #1a73e8; box-shadow: 0 2px 8px rgba(26,115,232,.15); }
+    .money-card.selected { border-color: #1a73e8; background: #e8f0fe; }
+    .money-card .flag { font-size: 28px; display: block; margin-bottom: 4px; }
+    .money-card .code { font-weight: 700; font-size: 14px; }
+    .money-card .name { font-size: 11px; color: #80868b; }
+    .money-card .rate { font-size: 12px; color: #1a73e8; margin-top: 4px; }
+
+    /* ── Stats ── */
+    .stat-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .stat-row { display: flex; align-items: center; gap: 10px; }
+    .stat-row label { font-size: 13px; color: #5f6368; min-width: 130px; }
+    .stat-row input, .stat-row select {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+    .stat-row input:focus { border-color: #1a73e8; }
+    .calc-stats-btn {
+      width: 100%;
+      padding: 12px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .calc-stats-btn:hover { background: #1557b0; }
+    .stats-result {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .stat-box {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+    .stat-box .s-label { font-size: 11px; color: #80868b; text-transform: uppercase; letter-spacing: .5px; }
+    .stat-box .s-val { font-size: 22px; font-weight: 700; color: #1a73e8; margin-top: 4px; }
+    .stat-box .s-sub { font-size: 11px; color: #80868b; }
+
+    /* ── Bar chart ── */
+    .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 100px; margin-top: 10px; }
+    .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar {
+      width: 100%;
+      background: #1a73e8;
+      border-radius: 4px 4px 0 0;
+      transition: height .4s ease;
+      min-height: 4px;
+    }
+    .bar.interest { background: #34a853; }
+    .bar-lbl { font-size: 10px; color: #80868b; }
+
+    /* ── Crypto strip ── */
+    .crypto-strip {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .crypto-chip {
+      flex-shrink: 0;
+      background: #f8f9fa;
+      border: 1px solid #dadce0;
+      border-radius: 20px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .crypto-chip .c-icon { font-size: 20px; }
+    .crypto-chip .c-name { font-weight: 600; }
+    .crypto-chip .c-price { color: #137333; font-weight: 500; }
+    .crypto-chip .c-chg { font-size: 11px; }
+    .c-up { color: #137333; }
+    .c-dn { color: #d93025; }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      main { grid-template-columns: 1fr; }
+      .full { grid-column: 1; }
+      .money-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span>💰</span> Money Calculator</div>
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="calc">Calculator</button>
+    <button class="tab-btn" data-tab="convert">Convert</button>
+    <button class="tab-btn" data-tab="types">Currencies</button>
+    <button class="tab-btn" data-tab="stats">Stats</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ══ CALCULATOR ══ -->
+  <div class="section active" id="tab-calc">
+    <div class="card">
+      <h2><span class="icon">🧮</span> Calculator</h2>
+      <div class="calc-display">
+        <div class="calc-expr" id="calcExpr"></div>
+        <div class="calc-result" id="calcResult">0</div>
+      </div>
+      <div class="calc-grid">
+        <button class="btn btn-clear span2" onclick="calcClear()">AC</button>
+        <button class="btn btn-op" onclick="calcOp('%')">%</button>
+        <button class="btn btn-op" onclick="calcOp('÷')">÷</button>
+
+        <button class="btn btn-num" onclick="calcNum('7')">7</button>
+        <button class="btn btn-num" onclick="calcNum('8')">8</button>
+        <button class="btn btn-num" onclick="calcNum('9')">9</button>
+        <button class="btn btn-op" onclick="calcOp('×')">×</button>
+
+        <button class="btn btn-num" onclick="calcNum('4')">4</button>
+        <button class="btn btn-num" onclick="calcNum('5')">5</button>
+        <button class="btn btn-num" onclick="calcNum('6')">6</button>
+        <button class="btn btn-op" onclick="calcOp('−')">−</button>
+
+        <button class="btn btn-num" onclick="calcNum('1')">1</button>
+        <button class="btn btn-num" onclick="calcNum('2')">2</button>
+        <button class="btn btn-num" onclick="calcNum('3')">3</button>
+        <button class="btn btn-op" onclick="calcOp('+')">+</button>
+
+        <button class="btn btn-num" onclick="calcNum('0')">0</button>
+        <button class="btn btn-num" onclick="calcNum('.')">.</button>
+        <button class="btn btn-clear" onclick="calcBack()">⌫</button>
+        <button class="btn btn-eq" onclick="calcEquals()">=</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon">📊</span> Live Crypto Prices</h2>
+      <div class="crypto-strip" id="cryptoStrip"></div>
+      <div style="margin-top:18px;">
+        <h2 style="margin-bottom:10px;"><span class="icon">💡</span> Quick Money Facts</h2>
+        <div id="moneyFact" style="font-size:14px;color:#5f6368;line-height:1.6;padding:12px;background:#f8f9fa;border-radius:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONVERT ══ -->
+  <div class="section" id="tab-convert">
+    <div class="card full">
+      <h2><span class="icon">🔄</span> Currency Converter</h2>
+      <div class="conv-row">
+        <input type="number" id="convAmt" value="1" min="0" step="any" oninput="convertCurrency()" />
+        <select id="convFrom" onchange="convertCurrency()"></select>
+      </div>
+      <div style="text-align:center;margin:4px 0;">
+        <button class="swap-btn" onclick="swapCurrencies()" title="Swap">⇅</button>
+      </div>
+      <div class="conv-row">
+        <input type="number" id="convResult" placeholder="Result" readonly />
+        <select id="convTo" onchange="convertCurrency()"></select>
+      </div>
+      <div class="conv-result-box" id="convBox">—</div>
+      <div class="conv-rate" id="convRate"></div>
+
+      <h2 style="margin-top:24px;margin-bottom:12px;"><span class="icon">📈</span> Multi-Currency Table</h2>
+      <div id="multiTable"></div>
+    </div>
+  </div>
+
+  <!-- ══ CURRENCY TYPES ══ -->
+  <div class="section" id="tab-types">
+    <div class="card full">
+      <h2><span class="icon">🌍</span> World Currencies</h2>
+      <div class="money-grid" id="moneyGrid"></div>
+    </div>
+  </div>
+
+  <!-- ══ STATS ══ -->
+  <div class="section" id="tab-stats">
+    <div class="card">
+      <h2><span class="icon">📐</span> Compound Interest</h2>
+      <div class="stat-inputs">
+        <div class="stat-row">
+          <label>Principal ($)</label>
+          <input type="number" id="siPrincipal" value="10000" />
+        </div>
+        <div class="stat-row">
+          <label>Annual Rate (%)</label>
+          <input type="number" id="siRate" value="7" step="0.1" />
+        </div>
+        <div class="stat-row">
+          <label>Years</label>
+          <input type="number" id="siYears" value="10" min="1" max="50" />
+        </div>
+        <div class="stat-row">
+          <label>Compound</label>
+          <select id="siComp">
+            <option value="1">Annually</option>
+            <option value="4">Quarterly</option>
+            <option value="12" selected>Monthly</option>
+            <option value="365">Daily</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-stats-btn" onclick="calcStats()">Calculate</button>
+      <div class="stats-result" id="statsResult"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon">📊</span> Growth Chart</h2>
+      <div class="bar-chart" id="barChart"></div>
+      <div style="display:flex;gap:12px;margin-top:10px;font-size:12px;color:#5f6368;">
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:#1a73e8;border-radius:2px;display:inline-block;"></span> Principal</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:#34a853;border-radius:2px;display:inline-block;"></span> Interest</span>
+      </div>
+
+      <h2 style="margin-top:20px;margin-bottom:14px;"><span class="icon">🧾</span> Loan / EMI</h2>
+      <div class="stat-inputs">
+        <div class="stat-row">
+          <label>Loan Amount ($)</label>
+          <input type="number" id="loanAmt" value="20000" />
+        </div>
+        <div class="stat-row">
+          <label>Annual Rate (%)</label>
+          <input type="number" id="loanRate" value="5" step="0.1" />
+        </div>
+        <div class="stat-row">
+          <label>Tenure (months)</label>
+          <input type="number" id="loanMonths" value="60" />
+        </div>
+      </div>
+      <button class="calc-stats-btn" onclick="calcEMI()">Calculate EMI</button>
+      <div class="stats-result" id="emiResult"></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* ══════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════ */
+const FX = {
+  USD:1, EUR:.92, GBP:.79, JPY:149.5, INR:83.2, CNY:7.24, CAD:1.36,
+  AUD:1.53, CHF:.90, BRL:4.97, MXN:17.15, KRW:1325, SGD:1.34, HKD:7.82,
+  SEK:10.42, NOK:10.65, DKK:6.88, NZD:1.63, ZAR:18.6, THB:35.1,
+  AED:3.67, SAR:3.75, TRY:32.0, RUB:92.5, PLN:4.0
+};
+
+const CURRENCIES = [
+  {code:"USD",name:"US Dollar",flag:"🇺🇸"},
+  {code:"EUR",name:"Euro",flag:"🇪🇺"},
+  {code:"GBP",name:"British Pound",flag:"🇬🇧"},
+  {code:"JPY",name:"Japanese Yen",flag:"🇯🇵"},
+  {code:"INR",name:"Indian Rupee",flag:"🇮🇳"},
+  {code:"CNY",name:"Chinese Yuan",flag:"🇨🇳"},
+  {code:"CAD",name:"Canadian Dollar",flag:"🇨🇦"},
+  {code:"AUD",name:"Australian Dollar",flag:"🇦🇺"},
+  {code:"CHF",name:"Swiss Franc",flag:"🇨🇭"},
+  {code:"BRL",name:"Brazilian Real",flag:"🇧🇷"},
+  {code:"MXN",name:"Mexican Peso",flag:"🇲🇽"},
+  {code:"KRW",name:"South Korean Won",flag:"🇰🇷"},
+  {code:"SGD",name:"Singapore Dollar",flag:"🇸🇬"},
+  {code:"HKD",name:"Hong Kong Dollar",flag:"🇭🇰"},
+  {code:"SEK",name:"Swedish Krona",flag:"🇸🇪"},
+  {code:"NOK",name:"Norwegian Krone",flag:"🇳🇴"},
+  {code:"DKK",name:"Danish Krone",flag:"🇩🇰"},
+  {code:"NZD",name:"New Zealand Dollar",flag:"🇳🇿"},
+  {code:"ZAR",name:"South African Rand",flag:"🇿🇦"},
+  {code:"THB",name:"Thai Baht",flag:"🇹🇭"},
+  {code:"AED",name:"UAE Dirham",flag:"🇦🇪"},
+  {code:"SAR",name:"Saudi Riyal",flag:"🇸🇦"},
+  {code:"TRY",name:"Turkish Lira",flag:"🇹🇷"},
+  {code:"RUB",name:"Russian Ruble",flag:"🇷🇺"},
+  {code:"PLN",name:"Polish Zloty",flag:"🇵🇱"},
+];
+
+const CRYPTO = [
+  {icon:"₿",name:"BTC",price:67420,chg:+2.3},
+  {icon:"Ξ",name:"ETH",price:3540,chg:-0.8},
+  {icon:"◎",name:"SOL",price:172,chg:+5.1},
+  {icon:"Ł",name:"LTC",price:84,chg:+1.2},
+  {icon:"✕",name:"XRP",price:0.62,chg:-1.4},
+  {icon:"◆",name:"BNB",price:412,chg:+0.5},
+  {icon:"🌕",name:"DOGE",price:0.14,chg:+3.9},
+];
+
+const FACTS = [
+  "The U.S. dollar is the world's primary reserve currency, used in ~60% of global foreign exchange reserves.",
+  "The first paper money was invented in China around 700 AD during the Tang Dynasty.",
+  "The Federal Reserve was created in 1913 to stabilize the U.S. banking system.",
+  "Gold has been used as money for over 2,500 years.",
+  "Credit cards were first introduced in the 1950s by Diners Club.",
+  "Bitcoin's total supply is capped at 21 million coins.",
+  "The Euro is used by 20 out of 27 EU member states.",
+  "Compound interest doubles money roughly every (72 ÷ rate%) years — the Rule of 72.",
+  "More than 180 currencies are recognized by the UN as legal tender.",
+  "The U.S. penny costs about 2.7 cents to produce.",
+];
+
+/* ══════════════════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════════════════ */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ══════════════════════════════════════════════
+   CALCULATOR
+══════════════════════════════════════════════ */
+let calcExpr = '', calcNew = true;
+
+function calcNum(v) {
+  if (calcNew) { calcExpr = ''; calcNew = false; }
+  if (v === '.' && calcExpr.split(/[+\-×÷%]/).pop().includes('.')) return;
+  calcExpr += v;
+  document.getElementById('calcResult').textContent = calcExpr;
+}
+function calcOp(op) {
+  calcNew = false;
+  if (calcExpr && '×÷+−%'.includes(calcExpr.slice(-1))) calcExpr = calcExpr.slice(0,-1);
+  calcExpr += op;
+  document.getElementById('calcExpr').textContent = calcExpr;
+  document.getElementById('calcResult').textContent = calcExpr;
+}
+function calcClear() {
+  calcExpr = ''; calcNew = true;
+  document.getElementById('calcExpr').textContent = '';
+  document.getElementById('calcResult').textContent = '0';
+}
+function calcBack() {
+  calcExpr = calcExpr.slice(0,-1);
+  document.getElementById('calcResult').textContent = calcExpr || '0';
+}
+function calcEquals() {
+  try {
+    const expr = calcExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+    const result = Function('"use strict"; return (' + expr + ')')();
+    document.getElementById('calcExpr').textContent = calcExpr + ' =';
+    const formatted = Number.isInteger(result) ? result.toLocaleString() : parseFloat(result.toFixed(10)).toLocaleString();
+    document.getElementById('calcResult').textContent = formatted;
+    calcExpr = String(result);
+    calcNew = true;
+  } catch {
+    document.getElementById('calcResult').textContent = 'Error';
+    calcExpr = ''; calcNew = true;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   CRYPTO STRIP
+══════════════════════════════════════════════ */
+function renderCrypto() {
+  const strip = document.getElementById('cryptoStrip');
+  strip.innerHTML = CRYPTO.map(c => `
+    <div class="crypto-chip">
+      <span class="c-icon">${c.icon}</span>
+      <div>
+        <div class="c-name">${c.name}</div>
+        <div class="c-price">$${c.price.toLocaleString()}</div>
+      </div>
+      <span class="c-chg ${c.chg >= 0 ? 'c-up' : 'c-dn'}">${c.chg >= 0 ? '+' : ''}${c.chg}%</span>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════════
+   MONEY FACT ROTATOR
+══════════════════════════════════════════════ */
+let factIdx = 0;
+function rotateFact() {
+  document.getElementById('moneyFact').textContent = FACTS[factIdx];
+  factIdx = (factIdx + 1) % FACTS.length;
+}
+
+/* ══════════════════════════════════════════════
+   CURRENCY CONVERTER
+══════════════════════════════════════════════ */
+function populateSelects() {
+  const opts = CURRENCIES.map(c => `<option value="${c.code}">${c.flag} ${c.code} – ${c.name}</option>`).join('');
+  document.getElementById('convFrom').innerHTML = opts;
+  document.getElementById('convTo').innerHTML = opts;
+  document.getElementById('convTo').value = 'EUR';
+}
+
+function convertCurrency() {
+  const amt = parseFloat(document.getElementById('convAmt').value) || 0;
+  const from = document.getElementById('convFrom').value;
+  const to = document.getElementById('convTo').value;
+  const rate = FX[to] / FX[from];
+  const result = amt * rate;
+  document.getElementById('convResult').value = result.toFixed(4);
+  const fromObj = CURRENCIES.find(c=>c.code===from);
+  const toObj   = CURRENCIES.find(c=>c.code===to);
+  document.getElementById('convBox').textContent =
+    `${fromObj.flag} ${amt.toLocaleString()} ${from}  =  ${toObj.flag} ${result.toFixed(4)} ${to}`;
+  document.getElementById('convRate').textContent =
+    `1 ${from} = ${rate.toFixed(6)} ${to}  ·  1 ${to} = ${(1/rate).toFixed(6)} ${from}`;
+  renderMultiTable(amt, from);
+}
+
+function swapCurrencies() {
+  const f = document.getElementById('convFrom').value;
+  const t = document.getElementById('convTo').value;
+  document.getElementById('convFrom').value = t;
+  document.getElementById('convTo').value = f;
+  convertCurrency();
+}
+
+function renderMultiTable(amt, from) {
+  const majors = ['USD','EUR','GBP','JPY','INR','CNY','CAD','AUD','CHF','BRL'];
+  const rows = majors.map(code => {
+    const c = CURRENCIES.find(x=>x.code===code);
+    const rate = FX[code] / FX[from];
+    return `<tr>
+      <td style="padding:8px 12px;font-size:18px;">${c.flag}</td>
+      <td style="padding:8px 4px;font-weight:600;">${code}</td>
+      <td style="padding:8px 4px;color:#5f6368;font-size:13px;">${c.name}</td>
+      <td style="padding:8px 12px;text-align:right;font-weight:600;color:#1a73e8;">
+        ${(amt*rate).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:4})}
+      </td>
+    </tr>`;
+  }).join('');
+  document.getElementById('multiTable').innerHTML =
+    `<table style="width:100%;border-collapse:collapse;">
+       <thead><tr style="background:#f8f9fa;font-size:12px;color:#80868b;text-transform:uppercase;">
+         <th style="padding:8px 12px;text-align:left;" colspan="3">Currency</th>
+         <th style="padding:8px 12px;text-align:right;">Value</th>
+       </tr></thead>
+       <tbody>${rows}</tbody>
+     </table>`;
+}
+
+/* ══════════════════════════════════════════════
+   CURRENCY TYPES GRID
+══════════════════════════════════════════════ */
+function renderMoneyGrid() {
+  const grid = document.getElementById('moneyGrid');
+  grid.innerHTML = CURRENCIES.map(c => `
+    <div class="money-card" onclick="selectCurrency('${c.code}',this)">
+      <span class="flag">${c.flag}</span>
+      <div class="code">${c.code}</div>
+      <div class="name">${c.name}</div>
+      <div class="rate">1 USD = ${FX[c.code]} ${c.code}</div>
+    </div>`).join('');
+}
+
+function selectCurrency(code, el) {
+  document.querySelectorAll('.money-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+/* ══════════════════════════════════════════════
+   STATS – COMPOUND INTEREST
+══════════════════════════════════════════════ */
+function fmt(n) {
+  return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function calcStats() {
+  const P = parseFloat(document.getElementById('siPrincipal').value) || 0;
+  const r = parseFloat(document.getElementById('siRate').value) / 100 || 0;
+  const t = parseFloat(document.getElementById('siYears').value) || 1;
+  const n = parseInt(document.getElementById('siComp').value);
+
+  const A = P * Math.pow(1 + r/n, n*t);
+  const interest = A - P;
+  const simple = P * r * t;
+  const rule72 = r > 0 ? (72 / (r*100)).toFixed(1) : '—';
+
+  document.getElementById('statsResult').innerHTML = `
+    <div class="stat-box">
+      <div class="s-label">Final Amount</div>
+      <div class="s-val">$${fmt(A)}</div>
+      <div class="s-sub">after ${t} years</div>
+    </div>
+    <div class="stat-box">
+      <div class="s-label">Total Interest</div>
+      <div class="s-val" style="color:#34a853;">$${fmt(interest)}</div>
+      <div class="s-sub">${((interest/P)*100).toFixed(1)}% gain</div>
+    </div>
+    <div class="stat-box">
+      <div class="s-label">Simple Interest</div>
+      <div class="s-val" style="color:#ea8600;">$${fmt(simple)}</div>
+      <div class="s-sub">for comparison</div>
+    </div>
+    <div class="stat-box">
+      <div class="s-label">Doubles In</div>
+      <div class="s-val" style="color:#9334e6;">${rule72} yrs</div>
+      <div class="s-sub">Rule of 72</div>
+    </div>`;
+
+  renderBarChart(P, r, n, t);
+}
+
+function renderBarChart(P, r, n, t) {
+  const years = Math.min(t, 10);
+  const chart = document.getElementById('barChart');
+  const data = Array.from({length:years}, (_,i) => {
+    const A = P * Math.pow(1 + r/n, n*(i+1));
+    return {year:i+1, principal:P, interest:A-P, total:A};
+  });
+  const maxVal = Math.max(...data.map(d=>d.total));
+  chart.innerHTML = data.map(d => {
+    const pH = (d.principal/maxVal*90).toFixed(1);
+    const iH = (d.interest/maxVal*90).toFixed(1);
+    return `<div class="bar-wrap">
+      <div style="display:flex;flex-direction:column;align-items:center;width:100%;">
+        <div class="bar interest" style="height:${iH}px;width:100%;"></div>
+        <div class="bar" style="height:${pH}px;width:100%;border-radius:0 0 4px 4px;"></div>
+      </div>
+      <div class="bar-lbl">Y${d.year}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════
+   STATS – EMI CALCULATOR
+══════════════════════════════════════════════ */
+function calcEMI() {
+  const P = parseFloat(document.getElementById('loanAmt').value) || 0;
+  const r = parseFloat(document.getElementById('loanRate').value) / 100 / 12 || 0;
+  const n = parseInt(document.getElementById('loanMonths').value) || 1;
+
+  const emi = r === 0 ? P/n : P * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1);
+  const total = emi * n;
+  const totalInterest = total - P;
+
+  document.getElementById('emiResult').innerHTML = `
+    <div class="stat-box">
+      <div class="s-label">Monthly EMI</div>
+      <div class="s-val">$${fmt(emi)}</div>
+      <div class="s-sub">per month</div>
+    </div>
+    <div class="stat-box">
+      <div class="s-label">Total Payment</div>
+      <div class="s-val" style="color:#ea8600;">$${fmt(total)}</div>
+      <div class="s-sub">${n} payments</div>
+    </div>
+    <div class="stat-box">
+      <div class="s-label">Total Interest</div>
+      <div class="s-val" style="color:#d93025;">$${fmt(totalInterest)}</div>
+      <div class="s-sub">${((totalInterest/P)*100).toFixed(1)}% of loan</div>
+    </div>
+    <div class="stat-box">
+      <div class="s-label">Principal</div>
+      <div class="s-val" style="color:#1a73e8;">$${fmt(P)}</div>
+      <div class="s-sub">${((P/total)*100).toFixed(1)}% of total</div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════
+   KEYBOARD SUPPORT
+══════════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab;
+  if (activeTab !== 'calc') return;
+  const key = e.key;
+  if ('0123456789.'.includes(key)) calcNum(key);
+  else if (key === '+') calcOp('+');
+  else if (key === '-') calcOp('−');
+  else if (key === '*') calcOp('×');
+  else if (key === '/') { e.preventDefault(); calcOp('÷'); }
+  else if (key === '%') calcOp('%');
+  else if (key === 'Enter' || key === '=') calcEquals();
+  else if (key === 'Backspace') calcBack();
+  else if (key === 'Escape') calcClear();
+});
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+renderCrypto();
+rotateFact();
+setInterval(rotateFact, 6000);
+populateSelects();
+convertCurrency();
+renderMoneyGrid();
+calcStats();
+</script>
+</body>
+</html>
